@@ -1,0 +1,12 @@
+{
+  "name": "20191010_scripts_GAds_weather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "15102019.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,9 @@
+{
+  "timeZone": "Europe/Paris",
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "executionApi": {
+    "access": "MYSELF"
+  }
+}

@@ -1,0 +1,178 @@
+/*==========================================================================
+        homeScrollMagic
+==========================================================================*/
+
+successdataAPP.animationSuccessData = function () {
+
+  var items = document.querySelectorAll('.toSD'), length = items.length;
+  var duration = 1.25;
+  var tl = new TimelineMax({ paused:true, repeat: -1, delay: 0 });
+  for (var i = 0; i < length; i += 1) {
+      tl.from(items[i], duration, { xPercent:-100, opacity: 0, ease: Power2.easeOut });
+      tl.to(items[i], duration, { xPercent:100, opacity: 0, ease: Power2.easeIn });
+  }
+  tl.play();
+}
+
+
+
+
+
+successdataAPP.homeScrollMagic = function () {
+
+  let preloaderAnimation = loader.imagesLoader()
+
+  if (preloaderAnimation.to($(".preloaderWrap .progress span"), 1, { width: 100, ease: Linear.easeNone}) && !Modernizr.touchevents) {
+
+    // -----------------  animationHeader
+    var animationHeaderTitle = new TimelineMax()
+    animationHeaderTitle
+      .fromTo($(".greetingName #headerIntro"), .5, { css: {opacity: 1} }, { css: {opacity: 0} })
+      .fromTo($(".greetingName #headerTitlePepeLopez"), 1, {y: 0}, {y: arrayOffsets[3]}, "-=.5")
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: "#header",
+        triggerHook: 0,
+        offset: 15,
+        duration: "100%"
+      })
+      .setTween(animationHeaderTitle)
+      .reverse(true)
+      //.addIndicators({ name: "animationHeader" })
+      .addTo(mainController)
+    )
+
+
+    // -----------------  animationAbout
+    var animationAbout = new TimelineMax()
+    animationAbout
+      .fromTo($(".aboutClayMockup"), 1, { y: arrayOffsets[2] }, {y: 0} )
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: "#about",
+        triggerHook: .5,
+        duration: "100%"
+      })
+      .setTween(animationAbout)
+      //.addIndicators({ name: "animationAbout" })
+      .addTo(mainController)
+    )
+
+
+    // -----------------  animationSlideIntro
+    var animationSlideIntro = new TimelineMax()
+    animationSlideIntro
+      .to($("#slideIntro .slideIntroLayerDawn"), 1, {y: -arrayOffsets[0]}, "-=.35")
+      .fromTo($("#slideIntro h1"), 1, {y: arrayOffsets[3]}, {y: -arrayOffsets[3]}, "-=1")
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: "#slideIntro",
+        triggerHook: 0.5,
+        duration: "100%"
+      })
+      .setTween(animationSlideIntro)
+      //.addIndicators({ name: "animationSlideIntro" })
+      .addTo(mainController)
+    )
+
+
+    // -----------------  meetr
+    var animationBGmeetr = new TimelineMax()
+    animationBGmeetr
+      .fromTo($(".meetrBg"), 1, {y: arrayOffsets[4]}, {y: -arrayOffsets[4]})
+      .fromTo($(".meetrBg img"), 1, {rotation: 0}, {rotation: 360}, '-=1')
+      .fromTo($(".slide1 .bgTitleSection_l"), 1, {y: arrayOffsets[1] / 5}, {y: -arrayOffsets[1] / 5}, '-=1')
+      .fromTo($(".slide1 .startupsimg01"), 1, {y: arrayOffsets[2]}, {y: 0}, '-=1')
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: '.slide1',
+        triggerHook: .5,
+        duration: "100%"
+      })
+      .setTween(animationBGmeetr)
+      //.addIndicators({ name: ".slide" })
+      .addTo(mainController)
+    )
+
+
+    // -----------------  publishcheck
+    var animationBGpublishcheck = new TimelineMax()
+    animationBGpublishcheck
+      .fromTo($(".publishcheckBg"), 1, {y: arrayOffsets[4]}, {y: -arrayOffsets[4]})
+      .fromTo($(".publishcheckBg img"), 1, {rotation: 0}, {rotation: 360}, '-=1')
+      .fromTo($(".slide2 .bgTitleSection_l"), 1, {y: arrayOffsets[1] / 5}, {y: -arrayOffsets[1] / 5}, '-=1')
+      .fromTo($(".slide2 .startupsimg01"), 1, {y: arrayOffsets[2]}, {y: 0}, '-=1')
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: '.slide2',
+        triggerHook: .5,
+        duration: "100%"
+      })
+      .setTween(animationBGpublishcheck)
+      .reverse(true)
+      //.addIndicators({ name: ".slide" })
+      .addTo(mainController))
+
+
+    // -----------------  superseed
+    var animationBGsuperseed = new TimelineMax()
+    animationBGsuperseed
+      .fromTo($(".superseedBg"), 1, { y: arrayOffsets[4]}, {y: -arrayOffsets[4]})
+      .fromTo($(".superseedBg img"), 1, {rotation: 0}, {rotation: 360}, '-=1')
+      .fromTo($(".slide3 .bgTitleSection_r"), 1, {y: arrayOffsets[1] / 5}, {y: -arrayOffsets[1] / 5}, '-=1')
+      .fromTo($(".slide3 .companiesimg01"), 1, {y: arrayOffsets[2]}, {y: 0}, '-=1')
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: '.slide3',
+        triggerHook: .5,
+        duration: "100%"
+      })
+      .setTween(animationBGsuperseed)
+      .reverse(true)
+      //.addIndicators({ name: ".slide" })
+      .addTo(mainController))
+
+
+    // -----------------  supernice
+    var animationBGsupernice = new TimelineMax()
+    animationBGsupernice
+      .fromTo($(".superniceBg"), 1, {y: arrayOffsets[4]}, {y: -arrayOffsets[4]})
+      .fromTo($(".superniceBg img"), 1, {rotation: 0}, {rotation: 360}, '-=1')
+      .fromTo($(".slide4 .bgTitleSection_r"), 1, {y: arrayOffsets[1] / 5}, {y: -arrayOffsets[1] / 5}, '-=1')
+      .fromTo($(".slide4 .companiesimg01"), 1, {y: arrayOffsets[2]}, {y: 0}, '-=1')
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: '.slide4',
+        triggerHook: .5,
+        duration: "100%"
+      })
+      .setTween(animationBGsupernice)
+      .reverse(true)
+      //.addIndicators({ name: ".slide" })
+      .addTo(mainController))
+
+
+    // -----------------  animationSlideBottom
+    var animationSlideBottom = new TimelineMax()
+    animationSlideBottom
+      .fromTo($("#slideBottom .slideBottomLayer1"), 1, {y: arrayOffsets[1]}, {y: -arrayOffsets[1]}, "-=1")
+      .fromTo($("#slideBottom h1"), 1, {y: arrayOffsets[3]}, {y: -arrayOffsets[3]}, "-=1")
+    scenes.push(
+      new ScrollMagic.Scene({
+        triggerElement: "#slideBottom",
+        triggerHook: 0.5,
+        duration: "100%"
+      })
+      .setTween(animationSlideBottom)
+      //.addIndicators({ name: "animationSlideIntro" })
+      .addTo(mainController)
+    )
+
+  } //preloaderAnimation.to($(".progress span"), 1, {width: 100,ease: Linear.easeNone}) && !Modernizr.touchevents
+
+}
+/*==========================================================================
+        homeScrollMagic
+==========================================================================*/
+
+

@@ -1,0 +1,734 @@
+// ----------------- global Variables
+var successdataAPP = window.successdataAPP || {};
+var mainController = window.mainController || (new ScrollMagic.Controller());
+var screenHeight = $(window).height();
+var arrayOffsets = [screenHeight, screenHeight * .1, screenHeight * .2, screenHeight * .3, screenHeight * .4, screenHeight * .5]
+
+let scenes = [];
+let y = 0;
+// ----------------- global Variables
+
+
+
+/*==========================================================================
+        onInitialise
+==========================================================================*/
+successdataAPP.onInitialise = function () {
+
+  //successdataAPP.cf7preventmultiple()
+  //successdataAPP.cf7showloaderfirsttime()
+  successdataAPP.showMessageCaseStudies()
+
+  //-- Fancy Box -------------------------
+  $(".fancybox, .fancybox a").fancybox({});
+
+  //-- Main menu -------------------------
+  $('#toggle-menu').click(function() {
+    $(this).toggleClass('active');
+    $('#overlay-menu-Wrap').toggleClass('open');
+    if ($('#sectionMenu').hasClass('bgColorNavBar')) {
+      $('#sectionMenu').toggleClass('bgColorNavBar');
+    }
+  });
+
+  $('.menuItemActive a').click(function(e) {
+    e.preventDefault();
+  });
+
+  //-- MENU - Bg Navbar
+  var position = $(document).scrollTop(); 
+  var handlerMenu = function (){
+    $(document).on ('scroll', function(){
+      var scroll = $(document).scrollTop();
+      if(scroll > position) {
+       //console.log('scrollDown');
+        if (position > 100) {
+          $('#sectionMenu').addClass ('bgColorNavBar');
+        }
+        $('#sectionMenu').addClass ('hiddenMenu');
+        $('.page-header-fadeOut').addClass ('scrollOpacity');
+      } else {
+        //console.log('scrollUp');
+        $('#sectionMenu').addClass ('bgNavBar');
+        $('#sectionMenu').removeClass ('hiddenMenu');
+        $('.page-header-fadeOut').removeClass ('scrollOpacity');
+      }
+      position = scroll;
+      
+      if (scroll == 0) {$('#sectionMenu').removeClass ('hiddenMenu')}
+
+      if ($(this).scrollTop() == 0) {
+        $('#sectionMenu').removeClass('bgColorNavBar');
+      } 
+    });
+  }
+  handlerMenu ();
+
+  $('#toggle-menu').click(function() {
+    if ($(this).hasClass('active')){
+      $(document).off ('scroll');
+      //console.log('1');
+    }else{
+      handlerMenu ();
+      //console.log('2');
+    }
+  });
+
+
+
+
+
+
+
+
+  //-- lazyload -------------------------
+  window.lazySizesConfig = window.lazySizesConfig || {};
+  //page is optimized for fast onload event
+  //lazySizesConfig.preloadAfterLoad = true;
+  //add simple support for background images:
+  document.addEventListener('lazybeforeunveil', function(e){
+
+    //console.log('imageHQ')
+
+    let bg = e.target.getAttribute('data-bg');
+    if(bg){
+      let img = new Image();
+      img.src = bg;
+      let imgLoad = imagesLoaded(img, function() {
+        //console.log('#container background image loaded');
+      })
+      imgLoad.on( 'done', function( instance ) {
+        e.target.style.backgroundImage = 'url(' + img.src + ')';
+      });
+    }
+  });
+  
+  var deviceAgent = navigator.userAgent.toLowerCase();
+  var isTouchDevice = Modernizr.touch || 
+  (deviceAgent.match(/(iphone|ipod|ipad)/) ||
+  deviceAgent.match(/(android)/)  || 
+  deviceAgent.match(/(iemobile)/) || 
+  deviceAgent.match(/iphone/i) || 
+  deviceAgent.match(/ipad/i) || 
+  deviceAgent.match(/ipod/i) || 
+  deviceAgent.match(/blackberry/i) || 
+  deviceAgent.match(/bada/i));
+  if (Modernizr.mq('only screen and (min-width:600px)')&&(!isTouchDevice)) {
+    $('body').removeClass('touchDevice').addClass('desktop');
+    return 'isDesktop'
+  }else{
+    $('body').removeClass('desktop').addClass('touchDevice');
+    return 'isTouchDevice'
+  }
+
+}
+
+
+
+
+/*==========================================================================
+        onResize
+==========================================================================*/
+successdataAPP.onResize = function () {
+  var w = window,
+  d = document,
+  e = d.documentElement,
+  g = d.getElementsByTagName('body')[0],
+  x = w.innerWidth || e.clientWidth || g.clientWidth;
+
+  $(window).on('resize', function () {
+
+    successdataAPP.checkScreenOrientation()
+
+    var t = w.innerWidth || e.clientWidth || g.clientWidth;
+    if(t !== x) {
+      screenHeight = $(window).height();
+      mainController.destroy(true);
+      window.mainController = new ScrollMagic.Controller()
+      successdataAPP.homeScrollMagic()
+      if (successdataAPP.onInitialise()=='isDesktop'){
+        //successdataAPP.smoothScroll()
+        //successdataAPP.homeScrollTo()
+      }else{
+        location.reload()
+        window.scrollTo(0, 0)
+      }
+    }
+    arrayOffsets = [screenHeight, screenHeight * .1, screenHeight * .2, screenHeight * .3, screenHeight * .4, screenHeight * .5]
+  });
+}
+
+
+
+
+/*==========================================================================
+        Check checkScreenOrientation
+==========================================================================*/
+successdataAPP.checkScreenOrientation = function () {
+  screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+  screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+  $('body').removeClass('landscape portrait').addClass((screenWidth >= screenHeight) ? 'landscape' : 'portrait');
+}
+
+
+
+
+
+/*==========================================================================
+        Loader
+==========================================================================*/
+let loader = {
+  loaderImagesCounter: 0,
+  totalImagesToLoad: $(".bgImagePreload, .imagePreload").length,
+  updateTxtPerc: function () {
+    //console.log('Starting updateTxtPerc...');
+    percIntroAnimation = Math.round(100 * this.progress());
+    $(".preloaderWrap .txt-perc").text(percIntroAnimation + "%")
+    $(".preloaderWrap #preloaderBG").css({ opacity: 1 })
+    $(".preloaderWrap #preloader").css({
+      opacity: 1,
+      width: percIntroAnimation + "%"
+    })
+
+  },
+  removeLoader: function () {
+    //console.log('Starting removeLoader...');
+    var removeLoader = new TimelineMax;
+    return removeLoader
+    .to($(".preloaderWrap .txt-perc"), .3, {x: 100,autoAlpha: 0,ease: Back.easeIn}, .1)
+    .set($(".preloaderWrap #preloaderBG"), {className: "+=is-hidden"})
+    .set($("body"), {className: "-=is-loading"})
+    .set($("#about"), {className: "+=is-loaded"})
+    .set($(".preloaderWrap"), {className: "+=is-hidden"})
+     
+  },
+  imagesLoader: function () {
+    let introAnimation = new TimelineMax({
+      paused: true,
+      onUpdate: this.updateTxtPerc,
+      onComplete: this.removeLoader
+    })
+    let loaderImagesCounter = this.loaderImagesCounter
+    let totalImagesToLoad = this.totalImagesToLoad
+
+    //console.log('Starting imagesLoader...');
+    $(".bgImagePreload, .imagePreload").imagesLoaded({
+        background: !0
+      })
+      .always(function () {
+        //console.log('all images loaded');
+        if ( "projectsPage" == $('body').attr( "data-currentPage") ) {
+          successdataAPP.initialiseProjects()
+        }
+      })
+      .done(function () {
+        //console.log('all images successfully loaded');
+      })
+      .fail(function () {
+        //console.log('all images loaded, at least one is broken');
+      })
+      .progress(function (instance, image) {
+        var result = image.isLoaded ? 'loaded' : 'broken';
+        //console.log( 'image is ' + result + ' for ' + image.img.src );   
+        loaderImagesCounter++;
+        percLoadedImages = loaderImagesCounter / totalImagesToLoad;
+        TweenLite.to(introAnimation, .7, {
+          progress: percLoadedImages,
+          ease: Linear.easeNone
+        })
+      });
+
+    return introAnimation
+
+  }
+}
+
+
+
+
+
+
+
+/*==========================================================================
+        CONTACT FORM 7
+==========================================================================*/
+successdataAPP.cf7preventmultiple = function () {
+
+  $(document).on("keypress", "input", function(event) {
+    return event.keyCode != 13;
+  });
+
+  //---------------- contact-form-7 // prevent multiple Submit
+  jQuery(document).on('click', '.wpcf7-submit', function(e){
+
+    if( jQuery('.ajax-loader').hasClass('is-active') ) {
+      e.preventDefault();
+      return false;
+    }
+
+    function enableSubmit() {
+      setTimeout(function(){
+        if( jQuery('.ajax-loader').hasClass('is-active') ) {
+          enableSubmit()
+        }else{
+          $('.wpcf7-submit').removeClass('non-clickable');
+        }
+      },2000);
+    }
+
+    $('.wpcf7-submit').addClass('non-clickable');
+
+    enableSubmit()
+
+  });
+}
+
+successdataAPP.cf7showloaderfirsttime = function () {
+    //---------------- contact-form-7 // show Loader first time you get a page with a form
+    var $form = $('.via-barba #wpcf7-f49-o2 form');
+
+    if ($form.lenght){
+      wpcf7.initForm($form);
+      if (wpcf7.cached) {
+        wpcf7.refill($form);
+      }
+    }
+
+}
+
+successdataAPP.showMessageCaseStudies = function () {
+  document.addEventListener( 'wpcf7mailsent', function( event ) {
+    if ( '98' == event.detail.contactFormId ) {
+      $('#contact_popup').append( "<div class='messagePopUpForm'><strong>Wonderful! A relevant case study will be with you in a few moments.</strong></div>" )
+      }
+  }, false );
+}
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  successdataAPP.barba()
+});
+
+/*==========================================================================
+				BARBA
+==========================================================================*/
+successdataAPP.barba = function () {
+
+
+/*==========================================================================
+        homePage
+==========================================================================*/
+  var homePage = Barba.BaseView.extend({
+    namespace: 'homePage',
+    particlesScene: '',
+
+    onEnter: function () {
+      // The new Container is ready and attached to the DOM.
+      $('body').attr( "data-currentPage", "homePage" )
+    },
+    onEnterCompleted: function () {
+      // The Transition has just finished.
+      if (!window.mainController) {
+        window.mainController = new ScrollMagic.Controller()
+      }
+      successdataAPP.onInitialise()
+      particlesScene = successdataAPP.particlesWaves()
+      successdataAPP.animationSuccessData()
+      successdataAPP.onResize()
+      successdataAPP.checkScreenOrientation()
+      successdataAPP.homeScrollMagic()
+    },
+    onLeave: function () {
+      function clearThree(obj){
+        while(obj.children.length > 0){ 
+          clearThree(obj.children[0])
+          obj.remove(obj.children[0]);
+        }
+        if(obj.geometry) obj.geometry.dispose()
+        if(obj.material) obj.material.dispose()
+        if(obj.texture) obj.texture.dispose()
+      } 
+      // A new Transition toward a new page has just started.
+      clearThree(particlesScene)  
+    },
+    onLeaveCompleted: function () {
+      // The Container has just been removed from the DOM.
+      if (mainController) {
+        mainController.destroy(true);
+        mainController = null;
+      }
+    }
+  });
+  // Don't forget to init the view!
+  homePage.init();
+  
+
+
+
+
+/*==========================================================================
+      productPage
+==========================================================================*/
+var productPage = Barba.BaseView.extend({
+  namespace: 'productPage',
+  onEnter: function () {
+    // The new Container is ready and attached to the DOM.
+  },
+  onEnterCompleted: function () {
+    // The Transition has just finished.
+    if (!window.mainController) {
+      window.mainController = new ScrollMagic.Controller()
+    }
+    successdataAPP.onInitialise()
+    successdataAPP.onResize()
+    successdataAPP.checkScreenOrientation()
+  },
+  onLeave: function () {
+    // A new Transition toward a new page has just started.
+
+  },
+  onLeaveCompleted: function () {
+    // The Container has just been removed from the DOM.
+  }
+});
+// Don't forget to init the view!
+productPage.init();
+
+
+
+
+/*==========================================================================
+      howitworksPage
+==========================================================================*/
+var howitworksPage = Barba.BaseView.extend({
+  namespace: 'howitworksPage',
+  onEnter: function () {
+    // The new Container is ready and attached to the DOM.
+  },
+  onEnterCompleted: function () {
+    // The Transition has just finished.
+    if (!window.mainController) {
+      window.mainController = new ScrollMagic.Controller()
+    }
+    successdataAPP.onInitialise()
+    successdataAPP.animationSuccessData()
+    successdataAPP.onResize()
+    successdataAPP.checkScreenOrientation()
+  },
+  onLeave: function () {
+    // A new Transition toward a new page has just started.
+  },
+  onLeaveCompleted: function () {
+    // The Container has just been removed from the DOM.
+  }
+});
+// Don't forget to init the view!
+howitworksPage.init();
+
+
+
+
+
+/*==========================================================================
+      aboutPage
+==========================================================================*/
+var aboutPage = Barba.BaseView.extend({
+  namespace: 'aboutPage',
+  onEnter: function () {
+    // The new Container is ready and attached to the DOM.
+  },
+  onEnterCompleted: function () {
+    // The Transition has just finished.
+    if (!window.mainController) {
+      window.mainController = new ScrollMagic.Controller()
+    }
+    successdataAPP.onInitialise()
+    successdataAPP.onResize()
+    successdataAPP.checkScreenOrientation()
+  },
+  onLeave: function () {
+    // A new Transition toward a new page has just started.
+  },
+  onLeaveCompleted: function () {
+    // The Container has just been removed from the DOM.
+  }
+});
+// Don't forget to init the view!
+aboutPage.init();
+
+
+
+/*==========================================================================
+      contactPage
+==========================================================================*/
+var contactPage = Barba.BaseView.extend({
+  namespace: 'contactPage',
+  onEnter: function () {
+    // The new Container is ready and attached to the DOM.
+  },
+  onEnterCompleted: function () {
+    // The Transition has just finished.
+    if (!window.mainController) {
+      window.mainController = new ScrollMagic.Controller()
+    }
+    successdataAPP.cf7showloaderfirsttime()
+    successdataAPP.onInitialise()
+    successdataAPP.onResize()
+    successdataAPP.checkScreenOrientation()
+  },
+  onLeave: function () {
+    // A new Transition toward a new page has just started.
+  },
+  onLeaveCompleted: function () {
+    // The Container has just been removed from the DOM.
+  }
+});
+// Don't forget to init the view!
+contactPage.init();
+
+
+
+
+/*==========================================================================
+        unnamedPage
+==========================================================================*/
+var unnamedPage = Barba.BaseView.extend({
+  namespace: 'unnamedPage',
+  onEnter: function () {
+    // The new Container is ready and attached to the DOM.
+  },
+  onEnterCompleted: function () {
+    // The Transition has just finished.
+    if (!window.mainController) {
+      window.mainController = new ScrollMagic.Controller()
+    }
+    successdataAPP.onInitialise()
+    successdataAPP.onResize()
+    successdataAPP.checkScreenOrientation()
+  },
+  onLeave: function () {
+    // A new Transition toward a new page has just started.
+  },
+  onLeaveCompleted: function () {
+    // The Container has just been removed from the DOM.
+  }
+});
+// Don't forget to init the view!
+unnamedPage.init();
+
+
+
+
+/*==========================================================================
+        FadeTransition - Default
+==========================================================================*/
+var FadeTransition = Barba.BaseTransition.extend({
+  start: function() {
+    /**
+     * This function is automatically called as soon the Transition starts
+     * this.newContainerLoading is a Promise for the loading of the new container
+     * (Barba.js also comes with an handy Promise polyfill!)
+     */
+
+    // As soon the loading is finished and the old page is faded out, let's fade the new page
+    Promise
+      .all([this.newContainerLoading, this.fadeOut()])
+      .then(this.fadeIn.bind(this));
+  },
+
+  fadeOut: function() {
+    /**
+     * this.oldContainer is the HTMLElement of the old Container
+     */
+
+    return (
+      $(this.oldContainer).animate({ opacity: 0 }).promise().done(function() {  
+        $('.preloaderWrapIcon').addClass('active')  
+      })
+    )
+  },
+
+  fadeIn: function() {
+    /**
+     * this.newContainer is the HTMLElement of the new Container
+     * At this stage newContainer is on the DOM (inside our #barba-container and with visibility: hidden)
+     * Please note, newContainer is available just after newContainerLoading is resolved!
+     */
+    $('.preloaderWrapIcon').removeClass('active')  
+    var _this = this;
+    var $el = $(this.newContainer);
+
+    $(this.oldContainer).hide();
+    $(window).scrollTop(0);
+    $el.css({
+      visibility : 'visible',
+      opacity : 0
+    });
+
+    $el.animate({ opacity: 1 }, 400, function() {
+      /**
+       * Do not forget to call .done() as soon your transition is finished!
+       * .done() will automatically remove from the DOM the old Container
+       */
+      _this.done();
+    });
+  }
+});
+
+
+
+
+
+/*==========================================================================
+        Barba manage transitions
+==========================================================================*/
+
+Barba.Pjax.getTransition = function() {
+  /**
+   * Here you can use your own logic!
+   * For example you can use different Transition based on the current page or link...
+   */
+  return FadeTransition; 
+  };
+  Barba.Pjax.start();
+  Barba.Pjax.cacheEnabled = false;
+  Barba.Prefetch.init();
+
+  Barba.Dispatcher.on("linkClicked", function (HTMLElement, MouseEvent) { });
+  Barba.Dispatcher.on("initStateChange", function (currentStatus) { });
+  Barba.Dispatcher.on("newPageReady", function (currentStatus, prevStatus, HTMLElementContainer, newPageRawHTML) { $("body").addClass('via-barba') });
+  Barba.Dispatcher.on("transitionCompleted", function (currentStatus, prevStatus) { });
+};
+/*==========================================================================
+				BARBA
+==========================================================================*/
+
+
+
+
+
+
+
+
+
+
+/*==========================================================================
+				particles-waves
+==========================================================================*/
+
+successdataAPP.particlesWaves = function () {
+
+
+    var SEPARATION = 150,
+            AMOUNTX = 40,
+            AMOUNTY = 20;
+    
+        var container;
+        var camera, scene, renderer;
+    
+        var particles, particle, count = 0;
+    
+        var mouseX = 85,
+            mouseY = -342;
+
+    
+        init();
+        animate();
+    
+        function init() {
+    
+            container = document.createElement('div');
+            document.getElementById("particles-waves").appendChild(container);
+    
+            camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 1, 5000);
+            camera.position.z = 700;
+    
+            scene = new THREE.Scene();
+    
+            particles = new Array();
+    
+            var material = new THREE.ParticleBasicMaterial( {
+              map: THREE.ImageUtils.loadTexture( window.location+'/wp-content/themes/successdata/img/neon-dot.png' ) 
+            } )
+    
+            var i = 0;
+    
+            for (var ix = 0; ix < AMOUNTX; ix++) {
+    
+                for (var iy = 0; iy < AMOUNTY; iy++) {
+    
+                    particle = particles[i++] = new THREE.Particle(material);
+                    particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
+                    particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
+                    scene.add(particle);
+    
+                }
+    
+            }
+    
+            renderer = new THREE.CanvasRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement).setAttribute("id", "canvasParticlesWaves");
+
+            window.addEventListener('resize', onWindowResize, false);
+
+        }
+    
+        function onWindowResize() {
+    
+          windowHalfX = window.innerWidth / 2;
+          windowHalfY = window.innerHeight / 2;
+  
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+  
+          renderer.setSize(window.innerWidth, window.innerHeight);
+  
+        }
+
+
+
+        function animate() {
+    
+            requestAnimationFrame(animate);
+    
+            render();
+  
+        }
+    
+        function render() {
+    
+            camera.position.x += (mouseX - camera.position.x) * .05;
+            camera.position.y += (-mouseY - camera.position.y) * .05;
+            camera.lookAt(scene.position);
+    
+            var i = 0;
+    
+            for (var ix = 0; ix < AMOUNTX; ix++) {
+    
+                for (var iy = 0; iy < AMOUNTY; iy++) {
+    
+                    particle = particles[i++];
+                    particle.position.y = (Math.sin((ix + count) * 0.3) * 50) + (Math.sin((iy + count) * 0.5) * 50);
+                    particle.scale.x = particle.scale.y = (Math.sin((ix + count) * 0.3) + 1) * 2 + (Math.sin((iy + count) * 0.5) + 1) * 2;
+    
+                }
+    
+            }
+    
+            renderer.render(scene, camera);
+    
+            count += 0.1;
+
+        }
+
+        return scene
+
+  };
+/*==========================================================================
+				particles-waves
+==========================================================================*/

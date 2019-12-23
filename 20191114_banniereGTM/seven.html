@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <p class="ecemple">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam voluptate autem magnam tempora iste, beatae, sed aperiam, perferendis laboriosam voluptates harum velit illum dolorem laborum natus doloremque impedit modi assumenda!</p>
+  <p class="ecemple">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam voluptate autem magnam tempora iste, beatae, sed aperiam, perferendis laboriosam voluptates harum velit illum dolorem laborum natus doloremque impedit modi assumenda!</p>
+  <p class="ecemple">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam voluptate autem magnam tempora iste, beatae, sed aperiam, perferendis laboriosam voluptates harum velit illum dolorem laborum natus doloremque impedit modi assumenda!</p>
+  <p class="ecemple">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Totam voluptate autem magnam tempora iste, beatae, sed aperiam, perferendis laboriosam voluptates harum velit illum dolorem laborum natus doloremque impedit modi assumenda!</p>
+  <script language="javascript">
+    var body = document.body
+
+    var template = "\
+      <div id='promoBanniereWrapper'>\
+        <div id='promoBanniereGTM'>\
+          <div>\
+            <a href=''>Prêt·e pour Black Friday ? Ne loupez rien ! Pour recevoir nos offres exclusives en avant première, c'est par ici 👉💌</a>\
+            <span class='closeBan'>×</span>\
+            <span class='loupeBan'>🔍</span>\
+          </div>\
+        </div>\
+      </div>\
+      <style>\
+        body.promoBanniereGTM{padding-top:3em}\
+        body.tall.promoBanniereGTM {padding-top:10em}\
+        #promoBanniereGTM{height:3em;position:fixed;top:0;z-index:999999999;\
+          background:blue;\
+          width:100%;\
+          border-bottom:solid black;\
+        }\
+        body.tall.promoBanniereGTM #promoBanniereGTM{height:10em;}\
+        #promoBanniereGTM>div{width:70%;margin:0 auto;height: 100%;font-size:1.2em;line-height: 2em;}\
+        #promoBanniereGTM a{color:white;}\
+        .closeBan{float:right;cursor:pointer;font-size:1.5em;}\
+        .closeBan:hover{color:orange;}\
+        .closeBan:active{color:red;}\
+        \
+        .loupeBan{float:left;cursor:pointer;font-size:1.5em;}\
+        .loupeBan:hover{color:orange;}\
+        .loupeBan:active{color:red;}\
+        .loupeBan{float:left;cursor:pointer;font-size:1.5em;}\
+        .loupeBan:hover{}\
+        .loupeBan:active{}\
+      </style>\
+      ";
+      var vMobile =".loupeBan{display:none}\
+      "
+      isMobile = false
+      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ){
+        vMobile =""
+        isMobile = true
+      }
+      template+=isMobile
+
+      if(document.cookie.indexOf("promoBanniereGTM") == -1){
+        setCookie("promoBanniereGTM", false, 1)
+        console.log(document.cookie)
+        if(document.cookie.indexOf("promoBanniereGTM=false") != -1){
+          body.classList.add('promoBanniereGTM');
+          body.innerHTML = template + body.innerHTML;
+          promoBanniereGTM.getElementsByClassName('closeBan')[0].onclick = function(){
+            body.removeChild(promoBanniereWrapper);
+            body.classList.remove('promoBanniereGTM');
+          }
+          if(isMobile)
+            promoBanniereGTM.getElementsByClassName('loupeBan')[0].onclick = function(){
+              if(body.classList.contains("tall"))body.classList.remove('tall')
+              else body.classList.add('tall')
+            }
+        }
+        if(document.cookie.indexOf("promoBanniereGTM=true") != -1){
+          document.cookie.replace("promoBanniereGTM=true", "")
+        }
+      }
+      var cookies = document.cookie.split(";")
+      cookies.push("promoBanniereGTM=false")
+
+
+
+
+
+      function setCookie(name, value, expires){
+        var cookie=name + "=" + value + "; path=/; domain=." + location.hostname.replace(/^www\./i, "");
+        if (typeof expires !=="undefined"){
+          var now=new Date();
+          //console.log("Expire=" + expires);
+          now.setTime(now.getTime() + expires * 24 * 60 * 60 * 1000);
+          cookie +="; expires=" + now.toUTCString();
+        }
+        document.cookie=cookie;
+      }
+  </script>
+</body>
+</html>

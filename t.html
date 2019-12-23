@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+  <form onsubmit="return false;">
+    <ul>
+      <li><span>Goal n°1</span><input name="obj1" type="checkbox"></li>
+      <li><span>Goal n°2</span><input name="obj2" type="checkbox"></li>
+      <li><span>Goal n°3</span><input name="obj3" type="checkbox"></li>
+      <li><span>Goal n°4</span><input name="obj4" type="checkbox"></li>
+      <li><span>Goal n°5</span><input name="obj5" type="checkbox"></li>
+      <li><span>Goal n°6</span><input name="obj6" type="checkbox"></li>
+      <li><span>Goal n°7</span><input name="obj7" type="checkbox"></li>
+      <li><span>Goal n°8</span><input name="obj8" type="checkbox"></li>
+      <li><span>Goal n°9</span><input name="obj9" type="checkbox"></li>
+      <li><span>Goal n°10</span><input name="obj10" type="checkbox"></li>
+    </ul>
+    <input type="submit" onclick="sendResp(this.form);">
+  </form>
+  <hr>
+  <input id="theResult" readonly />
+  <button onclick="theResult.select();document.execCommand('copy');">Copy</button>
+
+  <script>
+    function sendResp(e) {
+      //console.log(e.obj1.checked)
+      let checkedInput = []
+      let toReturn = ""
+      for(i=1;i<=10;i++)
+        if(e["obj"+i].checked)checkedInput.push("ga:goal"+i+"Starts")
+      toReturn = checkedInput.join(";")
+      theResult.value = toReturn
+      theResult.select()
+    }
+    function nbChar(chaine,lettre) {
+      return chaine.match(new RegExp(lettre,"gi")).length;
+    }
+    alert(nbChar("ofgkdgfd;fpokofgd;fpof;vopsd;po;p;s", ";"))
+  </script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+<script>
+  if(location.href.indexOf('/fr/') != -1){
+    console.log(location.href.replace('/fr/', '/'))
+    document.location.href=location.href.replace('/fr/', '/')
+  }
+  if(location.hash.indexOf('#redirect') != -1)
+    location.href="https://boutiques-sevens.com/"
+</script>
